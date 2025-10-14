@@ -1,0 +1,157 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+:root {
+	--bg:#000000;
+	--calculator_bg:rgb(20, 20, 20);
+	--button:rgb(50, 50, 50);
+	--button_hover:rgb(70, 70, 70);
+	--text:#ffff;
+	--border: #111827;
+}
+
+h1 {
+	margin: 0;
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 50px 0;
+	margin: 0;
+	font-family:Inter, Roboto, Arial, sans-serif;
+	background: var(--bg);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	min-height: 100vh
+}
+
+.container {
+	border-radius: 2px;
+	border: 1px solid var(--border);
+	background: var(--calculator_bg);
+	color: white;
+}
+
+.header {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 0 20px 0;
+	height: 40px;
+	text-transform: uppercase;
+}
+
+.button_burger {
+	position: absolute;
+	left: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 35px;
+	width: 35px;
+	transition: background 0.15s linear;
+}
+
+.button_burger:hover {
+	border-radius: 4px;
+}
+
+.burger_inner {
+	position: relative;
+	display: block;
+	width: 25px;
+	height: 3px;
+	top: 0;
+	border-radius: 4px;
+	background-color: white;
+	transition: transform 0.075s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.burger_inner::before,
+.burger_inner::after {
+	position: absolute;
+	content: '';
+	display: block;
+	width: 25px;
+	height: 3px;
+	border-radius: 4px;
+	background-color: white;
+}
+
+.burger_inner:before {
+	top: -8px;
+	transition: top 0.075s 0.12s ease, opacity 0.075s ease;
+}
+
+.burger_inner::after {
+	bottom: -8px;
+	transition: top 0.075s 0.12s ease, opacity 0.075s ease;
+}
+
+.calculator_header {
+	font-size: 18px;
+}
+
+.calculator {
+	display: flex;
+	flex-direction: column;
+	min-height: 400px;
+	width: 400px;
+	min-width: 300px;
+}
+
+.input {
+	width: 100%;
+	height: 50px;
+	background: var(--calculator_bg);
+	border: 2px solid var(--button);
+	color: white;
+	padding: 0 10px;
+}
+
+.input:focus {
+	outline: none;
+}
+
+.result {
+	width: 100%;
+	height: 30px;
+	margin: 0 0 10px 0;
+}
+
+.buttons {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(5, 1fr);
+	grid-gap: 5px;
+	width: 100%;
+	flex-grow: 1;
+	padding: 5px;
+}
+
+.reset {
+	grid-column-start: 1;
+	grid-column-end: 3;
+}
+
+.button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: var(--button);
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.button_burger:hover,
+.button:hover {
+	background: var(--button_hover);
+}
