@@ -60,7 +60,8 @@ body {
 	transition: background 0.15s linear;
 }
 
-.button_burger:hover {
+.button_burger:hover,
+.button_history:hover {
 	border-radius: 4px;
 }
 
@@ -68,7 +69,7 @@ body {
 	position: relative;
 	display: block;
 	width: 25px;
-	height: 3px;
+	height: 2px;
 	top: 0;
 	border-radius: 4px;
 	background-color: white;
@@ -81,7 +82,7 @@ body {
 	content: '';
 	display: block;
 	width: 25px;
-	height: 3px;
+	height: 2px;
 	border-radius: 4px;
 	background-color: white;
 }
@@ -96,6 +97,21 @@ body {
 	transition: top 0.075s 0.12s ease, opacity 0.075s ease;
 }
 
+.button_history {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	right: 4px;
+	width: 35px;
+	height: 35px;
+	top: 3px;
+}
+
+.icon {
+	font-size: 30px !important;
+}
+
 .calculator_header {
 	font-size: 18px;
 }
@@ -105,7 +121,6 @@ body {
 	flex-direction: column;
 	min-height: 400px;
 	width: 400px;
-	min-width: 300px;
 }
 
 .input {
@@ -152,6 +167,13 @@ body {
 }
 
 .button_burger:hover,
+.button_history:hover,
 .button:hover {
 	background: var(--button_hover);
+}
+
+@media (width <= 430px) {
+	.calculator {
+		width: clamp(290px, 90vw, 400px);
+	}
 }
