@@ -61,7 +61,8 @@ body {
 }
 
 .button_burger:hover,
-.button_history:hover {
+.button_history:hover,
+.button_history_delete:hover {
 	border-radius: 4px;
 }
 
@@ -108,10 +109,6 @@ body {
 	top: 3px;
 }
 
-.icon {
-	font-size: 30px !important;
-}
-
 .calculator_header {
 	font-size: 18px;
 }
@@ -142,6 +139,41 @@ body {
 	margin: 0 0 10px 0;
 }
 
+.history_container {
+	background-color: var(--button);
+	height: 0;
+	min-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.history_container.show {
+	position: relative;
+	min-height: 310px;
+	opacity: 1;
+	pointer-events: auto;
+	padding: 10px;
+}
+
+.history_text {
+	user-select: text;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+}
+
+.button_history_delete {
+	position: absolute;
+	width: 35px;
+	height: 35px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	bottom: 8px;
+	right: 4px;
+}
+
 .buttons {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
@@ -168,6 +200,7 @@ body {
 
 .button_burger:hover,
 .button_history:hover,
+.button_history_delete:hover,
 .button:hover {
 	background: var(--button_hover);
 }
