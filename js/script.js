@@ -23,7 +23,7 @@ deleteHistory.addEventListener('click', () => {
 
 const state = {
 	expression: '',
-	history: JSON.parse(localStorage.getItem('calcHistory') || [])
+	history: JSON.parse(localStorage.getItem('calcHistory') || '[]')
 };
 
 const pushHistoryEntry = (type, text) => {
@@ -34,6 +34,41 @@ const pushHistoryEntry = (type, text) => {
 	localStorage.setItem('calcHistory', JSON.stringify(state.history));
 }
 
+const renderInput = () => {
+	inputEl.value = state.expression;
+}
+
+const renderResult = (text) => {
+	result.innerText = text === undefined ? '' : String(text);
+}
+
+buttonsContainer.addEventListener('click', e => {
+	const button = e.target;
+	if(!button.classList.contains('button')) return;
+
+	const action = button.dataset.action;
+	const value = button.dataset.value;
+	
+	console.log(`Кликнули:`,  action, value);
+
+	if (action === 'digit') {
+		state.expression += value;
+		renderInput();
+	}
+	else if (action === 'operator') {
+		state.expression += `${value}`;
+		renderInput();
+	}
+	else if (action === 'backspace') {
+		state.expression = state.expression.slice(0, -1);
+		renderInput();
+	}
+	else if (action === 'clear') {
+		state.expression = '';
+		renderInput();
+		result.innerText = '';
+	}
+});
 
 
 
