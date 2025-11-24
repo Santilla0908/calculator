@@ -4,6 +4,13 @@ const result = document.querySelector('.result');
 const historyContainer = document.querySelector('.history_container');
 const textEl = historyContainer.querySelector('.history_text');
 const buttonsContainer = document.querySelector('.buttons');
+const deleteHistory = document.querySelector('.button_history_delete');
+
+const state = {
+	expression: '',
+	history: JSON.parse(localStorage.getItem('calcHistory') || '[]')
+};
+
 
 const renderHistory = () => {
 	if (state.history.length === 0) {
@@ -23,21 +30,14 @@ historyEl.addEventListener('click', () => {
 	}
 });
 
-const deleteHistory = document.querySelector('.button_history_delete');
-
 deleteHistory.addEventListener('click', () => {
 	textEl.innerText = '';
 	localStorage.removeItem('calcHistory');
 });
 
-const state = {
-	expression: '',
-	history: JSON.parse(localStorage.getItem('calcHistory') || '[]')
-};
-
-const pushHistoryEntry = (text) => {
+/*const pushHistoryEntry = (text) => {
 	localStorage.setItem('calcHistory', JSON.stringify(state.history));
-}
+}*/
 
 const renderInput = () => {
 	inputEl.value = state.expression;
@@ -48,6 +48,11 @@ const renderResult = (text) => {
 }
 
 const safeEvaluate = (expression) => {
+	if (expression.includes('=')) {
+		const parts = expression.split('=');
+		expression = parts[parts.length -1].trim();
+	}
+	
 	const tokens = expression.match(/(\d+\.?\d*|[\+\-\*\/])/g);
 
 	let current = new Big(tokens[0]);
@@ -85,9 +90,12 @@ const calculatorResult = () => {
 		let expression = state.expression;
 		const calculatedResult = safeEvaluate(expression);
 		renderResult(calculatedResult);
-		pushHistoryEntry('calculation', `${state.expression} = ${calculatedResult}`);
-		state.expression = '';
+		state.expression = `${expression} = ${calculatedResult}`;
 		renderInput();
+
+		state.history.push(`${expression} = ${calculatedResult}`);
+		localStorage.setItem('calcHistory', JSON.stringify(state.history));
+
 	} catch (error) {
 		console.log(`Ошибка вычисления:`, error);
 
