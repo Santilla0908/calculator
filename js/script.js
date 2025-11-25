@@ -1,6 +1,6 @@
 const historyEl = document.querySelector('.button_history');
-const inputEl = document.querySelector('.input');
-const result = document.querySelector('.result');
+const historyDisplayEl = document.querySelector('.history_display');
+const currentExpressionEl = document.querySelector('.current_expression');
 const historyContainer = document.querySelector('.history_container');
 const textEl = historyContainer.querySelector('.history_text');
 const buttonsContainer = document.querySelector('.buttons');
@@ -10,7 +10,6 @@ const state = {
 	expression: '',
 	history: JSON.parse(localStorage.getItem('calcHistory') || '[]')
 };
-
 
 const renderHistory = () => {
 	if (state.history.length === 0) {
@@ -35,23 +34,18 @@ deleteHistory.addEventListener('click', () => {
 	localStorage.removeItem('calcHistory');
 });
 
-/*const pushHistoryEntry = (text) => {
+const updateHistoryDisplay = (newEntry) => {
+	state.history.push(newEntry);
+
+	if (state.history.length > 2) {
+		state.history = state.history.slice(-2);
+	}
+
+	historyDisplayEl.innerText = state.history.join('\n');
 	localStorage.setItem('calcHistory', JSON.stringify(state.history));
-}*/
-
-const renderInput = () => {
-	inputEl.value = state.expression;
-}
-
-const renderResult = (text) => {
-	result.innerText = text === undefined ? '' : String(text);
 }
 
 const safeEvaluate = (expression) => {
-	if (expression.includes('=')) {
-		const parts = expression.split('=');
-		expression = parts[parts.length -1].trim();
-	}
 	
 	const tokens = expression.match(/(\d+\.?\d*|[\+\-\*\/])/g);
 
@@ -82,29 +76,37 @@ const safeEvaluate = (expression) => {
 
 const calculatorResult = () => {
 	if (!state.expression.trim()) {
-		result.innerText = 'Введите выражение';
+		currentExpressionEl.innerText = 'Введите выражение';
 		return;
 	}
 
 	try {
 		let expression = state.expression;
-		const calculatedResult = safeEvaluate(expression);
-		renderResult(calculatedResult);
-		state.expression = `${expression} = ${calculatedResult}`;
-		renderInput();
+		let finalOperator = '';
 
-		state.history.push(`${expression} = ${calculatedResult}`);
-		localStorage.setItem('calcHistory', JSON.stringify(state.history));
+		const lastCharacter = expression.slice(-1);
+		if (['+', '-', '*', '/'].includes(lastCharacter)) {
+			finalOperator = lastCharacter;
+			expression = expression.slice(0, -1);
+		}
+
+		const calculatedResult = safeEvaluate(expression);
+
+		const historyExpression = state.expression;
+		updateHistoryDisplay(`${historyExpression} = ${calculatedResult}`)
+
+		state.expression = calculatedResult + finalOperator;
+		currentExpressionEl.innerText = state.expression;
 
 	} catch (error) {
 		console.log(`Ошибка вычисления:`, error);
 
 		if (error.message.includes(`Деление на ноль`)) {
-			result.innerText = `Деление на ноль невозможно`;
+			currentExpressionEl.innerText = `Деление на ноль невозможно`;
 		}  else if (error.message.includes(`не завершено`)) {
-			result.innerText = `Выражение не завершено`;
+			currentExpressionEl.innerText = `Выражение не завершено`;
 		} else {
-			result.innerText = 'Ошибка вычисления';
+			currentExpressionEl.innerText = 'Ошибка вычисления';
 		}
 	}
 }
@@ -120,20 +122,22 @@ buttonsContainer.addEventListener('click', e => {
 
 	if (action === 'digit') {
 		state.expression += value;
-		renderInput();
+		currentExpressionEl.innerText = state.expression;
 	}
 	else if (action === 'operator') {
 		state.expression += value;
-		renderInput();
+		currentExpressionEl.innerText = state.expression;
 	}
 	else if (action === 'backspace') {
 		state.expression = state.expression.slice(0, -1);
-		renderInput();
+		currentExpressionEl.innerText = state.expression;
 	}
 	else if (action === 'clear') {
 		state.expression = '';
-		renderInput();
-		result.innerText = '';
+		state.history = [];
+		historyDisplayEl.innerText = '';
+		currentExpressionEl.innerText = '';
+		localStorage.removeItem('calcHistory');
 	}
 	else if (action === 'equals') {
 		calculatorResult();

@@ -120,20 +120,20 @@ body {
 	width: 400px;
 }
 
-.input {
+.history_display {
 	width: 100%;
 	height: 50px;
 	background: var(--calculator_bg);
 	border: 2px solid var(--button);
 	color: white;
-	padding: 0 10px;
+	padding: 15px 10px;
 }
 
-.input:focus {
+.history_display:focus {
 	outline: none;
 }
 
-.result {
+.current_expression {
 	width: 100%;
 	height: 30px;
 	margin: 0 0 10px 0;
