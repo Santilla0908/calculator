@@ -151,12 +151,21 @@ buttonsContainer.addEventListener('click', e => {
 	else if (action === 'backspace') {
 		const start = currentInputEl.selectionStart;
 		const end = currentInputEl.selectionEnd;
+		const expr = getExpression();
 
 		if (start !== end) {
-			const before = getExpression().slice(0, start);
-			const after = getExpression().slice(end);
-			setExpression(before + after, start - 1);
+			const before = expr.slice(0, start);
+			const after = expr.slice(end);
+			setExpression(before + after, start);
+			return;
 		}
+		if (start === 0) {
+			return;
+		}
+		const before = expr.slice(0, start -1);
+		const after = expr.slice(start);
+		const newCaretPos = start - 1;
+		setExpression(before + after, newCaretPos);
 	}
 	else if (action === 'clear') {
 		setExpression('');
