@@ -66,33 +66,98 @@ const updateHistoryDisplay = (newEntry) => {
 	localStorage.setItem('calcHistory', JSON.stringify(state.history));
 }
 
-const safeEvaluate = (expression) => {
-	
-	const tokens = expression.match(/(\d+\.?\d*|[\+\-\*\/])/g);
+const safeEvaluateWithPrecedence = (expression) => {
+	expression = String(expression).replace(/\s+/g, '').replace(/,/g, '.');
+	if (expression.length === 0) throw new Error('Пустое выражение');
 
-	let current = new Big(tokens[0]);
+	const tokens = [];
+	let numberBuffer = '';
+	for (let i = 0; i < expression.length; i++) {
+		const symbol = expression[i];
 
-	for (let i = 1; i < tokens.length; i += 2) {
-		const operator = tokens[i];
-		const nextNumber = tokens[i + 1];
-
-		if (!nextNumber) {
-			throw new Error(`Выражение не завершено`);
+		if (/[0-9.]/.test(symbol)) {
+			numberBuffer += symbol;
+			continue;
 		}
 
-		const nextBig = new Big(nextNumber);
+		if (numberBuffer) {
+			if ((numberBuffer.match(/\./g) || []).length > 1) {
+				throw new Error('Неправильный формат числа');
+			}
+			tokens.push(numberBuffer);
+			numberBuffer = '';
+		}
 
-		switch (operator) {
-			case '+': current = current.plus(nextBig); break;
-			case '-': current = current.minus(nextBig); break;
-			case '*': current = current.times(nextBig); break;
-			case '/':
-				if (nextBig.eq(0)) throw new Error(`Деление на ноль`);
-				current = current.div(nextBig);
-				break;
+		if (symbol === '-' && (tokens.length === 0 || /[+\-*/(]/.test(tokens[tokens.length - 1]))) {
+			numberBuffer = '-';
+			continue;
+		}
+
+		if (/[+\-*/]/.test(symbol)) {
+			tokens.push(symbol);
+			continue;
+		}
+
+		throw new Error('Недопустимый символ в выражении');
+	}
+
+	if(numberBuffer) {
+		if ((numberBuffer.match(/\./g) || []).length > 1) {
+			throw new Error('Неправильный формат числа');
+		}
+		tokens.push(numberBuffer);
+	}
+	if (tokens.length === 0) throw new Error('Пустое выражение');
+
+	const outputQueue = [];
+	const opStack = [];
+	const precedence = {
+		'+': 1,
+		'-': 1,
+		'*': 2,
+		'/': 2
+	}
+
+	for (const t of tokens) {
+		if (/^-?(?:\d+(\.\d*)?|\.\d+)$/.test(t)) {
+			outputQueue.push(t);
+		} else if (/[+\-*/]/.test(t)) {
+			while (opStack.length && precedence[opStack[opStack.length - 1]] >= precedence[t]) {
+				outputQueue.push(opStack.pop());
+			}
+			opStack.push(t);
+		} else {
+			throw new Error('Неизвестный токен');
 		}
 	}
-	return current.toString();
+
+	while (opStack.length) {
+		const p = opStack.pop();
+		outputQueue.push(p);
+	}
+
+	const evalStack = [];
+	for (const token of outputQueue) {
+		if (/^-?(?:\d+(\.\d*)?|\.\d+)$/.test(token)) {
+			evalStack.push(new Big(token));
+		} else {
+			const b = evalStack.pop();
+			const a = evalStack.pop();
+			if (a === undefined || b === undefined) throw new Error('Ошибка в выражении');
+			switch (token) {
+				case '+': evalStack.push(a.plus(b)); break;
+				case '-': evalStack.push(a.minus(b)); break;
+				case '*': evalStack.push(a.times(b)); break;
+				case '/':
+					if (b.eq(0)) throw new Error('Деление на ноль');
+					evalStack.push(a.div(b));
+					break;
+				default: throw new Error('Недопустимый оператор при вычислении');
+			}
+		}
+	}
+	if (evalStack.length !== 1) throw new Error('Ошибка вычисления');
+	return evalStack[0].toString();
 }
 
 const calculatorResult = () => {
@@ -113,7 +178,7 @@ const calculatorResult = () => {
 			expressionToCalculate = expressionToCalculate.slice(0, -1);
 		}
 
-		const calculatedResult = safeEvaluate(expressionToCalculate);
+		const calculatedResult = safeEvaluateWithPrecedence(expressionToCalculate);
 
 		updateHistoryDisplay(`${inputExpression} = ${calculatedResult}`)
 
