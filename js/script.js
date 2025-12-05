@@ -93,6 +93,11 @@ const safeEvaluateWithPrecedence = (expression) => {
 			continue;
 		}
 
+		if (symbol === '(' || symbol === ')') {
+			tokens.push(symbol);
+			continue;
+		}
+
 		if (/[+\-*/]/.test(symbol)) {
 			tokens.push(symbol);
 			continue;
@@ -126,6 +131,15 @@ const safeEvaluateWithPrecedence = (expression) => {
 				outputQueue.push(opStack.pop());
 			}
 			opStack.push(t);
+		} else if (t === '(') {
+			opStack.push(t);
+		} else if (t === ')') {
+			while (opStack.length && opStack[opStack.length - 1] !== '(') {
+				outputQueue.push(opStack.pop());
+			}
+			if (opStack.length === 0 || opStack.pop() !== '(') {
+				throw new Error('Скобки не согласованы');
+			}
 		} else {
 			throw new Error('Неизвестный токен');
 		}
@@ -133,6 +147,7 @@ const safeEvaluateWithPrecedence = (expression) => {
 
 	while (opStack.length) {
 		const p = opStack.pop();
+		if (p === '(' || p === ')') throw new Error('Скобки не согласованы')
 		outputQueue.push(p);
 	}
 
@@ -243,6 +258,72 @@ buttonsContainer.addEventListener('click', e => {
 	}
 });
 
+const allowedChars = /[0-9+\-*/().%]/;
 
+const specialKeys = {
+	calculate: ['Enter', '='],
+	clear: ['Escape', 'c'],
+};
 
+const allowedControl = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+	'Enter', 'Escape', 'Home', 'End', 'Tab'];
 
+window.addEventListener('keydown', (e) => {
+	const active = document.activeElement === currentInputEl;
+
+	if (specialKeys.calculate.includes(e.key)) {
+		if (!active) return;
+		e.preventDefault();
+		calculatorResult();
+		return;
+	}
+	if (specialKeys.clear.includes(e.key.toLowerCase())) {
+		if (!active) return;
+		e.preventDefault();
+		setExpression('');
+		return;
+	}
+	if (allowedControl.includes(e.key)) {
+		return;
+	}
+	if (e.ctrlKey || e.metaKey) return;
+	if (!active) return;
+
+	const key = e.key.length === 1 ? e.key : '';
+	if (allowedChars.test(key)) {
+		if (key === '.') {
+			const expression = getExpression();
+			const start = currentInputEl.selectionStart;
+			const lastNumberMatch = expression.slice(0, start).match(/-?\d+\.?\d*$/);
+			if (lastNumberMatch && lastNumberMatch[0].includes('.')) {
+				e.preventDefault();
+				return;
+			}
+		}
+		return;
+	}
+	e.preventDefault();
+});
+
+currentInputEl.addEventListener('paste', (e) => {
+	e.preventDefault();
+	const raw = (e.clipboardData || window.clipboardData).getData('text');
+	const noSpaces = raw.replace(/\s+/g, '');
+	const replacedCommas = noSpaces.replace(/,/g, '.');
+	const noExtraDots = replacedCommas.replace(/(\d*\.)\.+/g, '$1');
+	const finalText = noExtraDots.split('').filter(ch => allowedChars.test(ch)).join('');
+	if (!finalText) return;
+	insertAtCursor(finalText);
+});
+
+currentInputEl.addEventListener('input', () => {
+	const raw = getExpression();
+	const noSpaces = raw.replace(/\s+/g, '');
+	const replacedCommas = noSpaces.replace(/,/g, '.');
+	const noExtraDots = replacedCommas.replace(/(\d*\.)\.+/g, '$1');
+	const finalText = noExtraDots.split('').filter(ch => allowedChars.test(ch)).join('');
+	if (finalText !== raw) {
+		const pos = currentInputEl.selectionStart;
+		setExpression(finalText, Math.min(pos, finalText.length));
+	}
+});
