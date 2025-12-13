@@ -106,7 +106,7 @@ const safeEvaluateWithPrecedence = (expression) => {
 		throw new Error('Недопустимый символ в выражении');
 	}
 
-	if(numberBuffer) {
+	if (numberBuffer) {
 		if ((numberBuffer.match(/\./g) || []).length > 1) {
 			throw new Error('Неправильный формат числа');
 		}
@@ -134,7 +134,7 @@ const safeEvaluateWithPrecedence = (expression) => {
 		} else if (t === '(') {
 			opStack.push(t);
 		} else if (t === ')') {
-			while (opStack.length && opStack[opStack.length - 1] !== '(') {
+			while (opStack.length && (opStack[opStack.length - 1] !== '(')) {
 				outputQueue.push(opStack.pop());
 			}
 			if (opStack.length === 0 || opStack.pop() !== '(') {

@@ -6,8 +6,9 @@
 		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Калькулятор</title>
-		<link rel="stylesheet" href="./css/style.css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+		<link rel="stylesheet" href="./css/style.css">
+		
 		<script src="https://cdn.jsdelivr.net/npm/big.js@7.0.1/big.min.js"></script>
 		<script src="js/script.js" defer></script>
 	</head>
@@ -21,7 +22,7 @@
 				<h1 class="calculator_header">Калькулятор</h1>
 				
 				<div class="button_history" title="Журнал">
-					<span class="material-symbols-outlined icon">history</span>
+					<span class="material-symbols-outlined">history</span>
 				</div>
 				
 			</header>
@@ -35,14 +36,14 @@
 				<div class="history_container">
 					<div class="history_text"></div>
 					<div class="button_history_delete">
-						<span class="material-symbols-outlined">delete</span>
+						<span class="material-symbols-outlined icon">delete</span>
 					</div>
 				</div>
 				
 				<div class="buttons">
-					<div class="button reset" data-action="clear" title="сброс">Сброс</div>
+					<div class="button reset" data-action="clear" data-value="clear" title="сброс">Сброс</div>
 					
-					<div class="button" data-action="backspace" title="удалить">←</div>
+					<div class="button" data-action="backspace" data-value="backspace" title="удалить">←</div>
 					
 					<div class="button" data-action="operator" data-value="/" title="разделить">/</div>
 					
