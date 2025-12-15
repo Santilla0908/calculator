@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="./css/style.css">
 		
 		<script src="https://cdn.jsdelivr.net/npm/big.js@7.0.1/big.min.js"></script>
-		<script src="js/script.js" defer></script>
+		<script src="js/script2.js" defer></script>
 	</head>
 	
 	<body>
@@ -21,21 +21,18 @@
 				</div>
 				<h1 class="calculator_header">Калькулятор</h1>
 				
-				<div class="button_history" title="Журнал">
+				<div class="button history" title="Журнал">
 					<span class="material-symbols-outlined">history</span>
 				</div>
-				
 			</header>
 			
 			<div class="calculator">
 				<div class="history_display"></div>
-				<label>
-					<input name="text" type="text" class="current_expression_input">
-				</label>
+				<label><input name="text" type="text" class="display"></label>
 				
-				<div class="history_container">
-					<div class="history_text"></div>
-					<div class="button_history_delete">
+				<div class="log_items">
+					<div class="log_item"></div>
+					<div class="button delete">
 						<span class="material-symbols-outlined icon">delete</span>
 					</div>
 				</div>
@@ -43,9 +40,7 @@
 				<div class="buttons">
 					<div class="button reset" data-action="clear" data-value="clear" title="сброс">Сброс</div>
 					
-					<div class="button" data-action="backspace" data-value="backspace" title="удалить">←</div>
-					
-					<div class="button" data-action="operator" data-value="/" title="разделить">/</div>
+					<div class="button backspace" data-action="backspace" data-value="backspace" title="удалить">←</div>
 					
 					<div class="button" data-action="digit" data-value="7" title="7">7</div>
 					
@@ -53,7 +48,7 @@
 					
 					<div class="button" data-action="digit" data-value="9" title="9">9</div>
 					
-					<div class="button" data-action="operator" data-value="*" title="умножить">*</div>
+					<div class="button" data-action="operator" data-value="/" title="разделить">/</div>
 					
 					<div class="button" data-action="digit" data-value="4" title="4">4</div>
 					
@@ -61,7 +56,7 @@
 					
 					<div class="button" data-action="digit" data-value="6" title="6">6</div>
 					
-					<div class="button" data-action="operator" data-value="-" title="вычесть">-</div>
+					<div class="button" data-action="operator" data-value="*" title="умножить">*</div>
 					
 					<div class="button" data-action="digit" data-value="1" title="1">1</div>
 					
@@ -69,7 +64,7 @@
 					
 					<div class="button" data-action="digit" data-value="3" title="3">3</div>
 					
-					<div class="button" data-action="operator" data-value="+" title="прибавить">+</div>
+					<div class="button" data-action="operator" data-value="-" title="вычесть">-</div>
 					
 					<div class="button" data-action="digit" data-value="0" title="0">0</div>
 					
@@ -77,7 +72,13 @@
 					
 					<div class="button" data-action="percent" title="процент">%</div>
 					
-					<div class="button" data-action="equals" title="равно">=</div>
+					<div class="button" data-action="operator" data-value="+" title="прибавить">+</div>
+					
+					<div class="button" data-action="bracket" data-value="(" title="открывающая скобка">(</div>
+					
+					<div class="button" data-action="bracket" data-value=")" title="закрывающая скобка">)</div>
+					
+					<div class="button equals" data-action="equals" title="равно">=</div>
 				</div>
 			</div>
 		</div>

@@ -1,10 +1,10 @@
-const historyEl = document.querySelector('.button_history');
+const historyEl = document.querySelector('.history');
 const historyDisplayEl = document.querySelector('.history_display');
-const currentInputEl = document.querySelector('.current_expression_input');
+const currentInputEl = document.querySelector('.display');
 const historyContainer = document.querySelector('.history_container');
 const textEl = historyContainer.querySelector('.history_text');
 const buttonsContainer = document.querySelector('.buttons');
-const deleteHistory = document.querySelector('.button_history_delete');
+const deleteHistory = document.querySelector('.delete');
 
 const state = {
 	history: JSON.parse(localStorage.getItem('calcHistory') || '[]')
@@ -226,6 +226,9 @@ buttonsContainer.addEventListener('click', e => {
 		insertAtCursor(value);
 	}
 	else if (action === 'operator') {
+		insertAtCursor(value);
+	}
+	else if (action === 'bracket') {
 		insertAtCursor(value);
 	}
 	else if (action === 'backspace') {

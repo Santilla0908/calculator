@@ -1,4 +1,10 @@
 const buttonEls = [ ...document.querySelectorAll('.button') ];
+const displayEl = document.querySelector('.display');
+
+const exceptions = {
+	divisionByZero: 'Деление на ноль',
+	numberTooLong: 'Переполнение',
+};
 
 const getInputValue = e => {
 	const value = (() => {
@@ -30,6 +36,9 @@ const getInputValue = e => {
 			case '/':
 			case '.':
 			case '=':
+			case '(':
+			case ')':
+			case '%':
 				return key;
 			default:
 				return null;
@@ -40,9 +49,48 @@ const getInputValue = e => {
 	return number;
 }
 
+const clear = () => {
+	displayEl.value = '0';
+}
+
+const calculate = () => {
+
+}
+
 const inputHandler = e => {
 	const inputValue = getInputValue(e);
 	if (inputValue === null) return;
+
+	if (inputValue === 'clear') {
+		clear();
+		return;
+	}
+
+	if (typeof inputValue === 'number') {
+		if (displayEl.value === '0') {
+			displayEl.value = String(inputValue);
+		} else {
+			displayEl.value += inputValue
+		}
+		return;
+	}
+
+	if (inputValue === '.') {
+		if (displayEl.value.includes('.')) return;
+		displayEl.value += '.';
+		return;
+	}
+
+	if (inputValue === 'backspace') return;
+
+	if (inputValue === '=') {
+		calculate();
+		return;
+	}
+
+	if (['+', '-', '*', '/', '%'].includes(inputValue)) return;
+
+	if (inputValue === '(' || inputValue === ')') return;
 };
 
 buttonEls.forEach(buttonEl => {
