@@ -98,7 +98,7 @@ body {
 	transition: top 0.075s 0.12s ease, opacity 0.075s ease;
 }
 
-.history {
+.button.log_open {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -107,6 +107,7 @@ body {
 	width: 35px;
 	height: 35px;
 	top: 3px;
+	background: none;
 }
 
 .calculator_header {
@@ -171,7 +172,7 @@ body {
 	-ms-user-select: text;
 }
 
-.delete {
+.log_delete {
 	position: absolute;
 	width: 35px;
 	height: 35px;
@@ -214,8 +215,8 @@ body {
 }
 
 .button_burger:hover,
-.history:hover,
-.delete:hover,
+.log_open:hover,
+.log_delete:hover,
 .button:hover {
 	background: var(--button_hover);
 }

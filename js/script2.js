@@ -67,28 +67,71 @@ const inputHandler = e => {
 	}
 
 	if (typeof inputValue === 'number') {
+		if (Object.values(exceptions).includes(displayEl.value)) {
+			displayEl.value = String(inputValue);
+			return;
+		}
 		if (displayEl.value === '0') {
 			displayEl.value = String(inputValue);
-		} else {
-			displayEl.value += inputValue
+			return;
 		}
+		displayEl.value += inputValue
 		return;
 	}
 
 	if (inputValue === '.') {
+		if (Object.values(exceptions).includes(displayEl.value)) {
+			displayEl.value = '0.';
+			return;
+		}
 		if (displayEl.value.includes('.')) return;
 		displayEl.value += '.';
 		return;
 	}
 
-	if (inputValue === 'backspace') return;
+	if (inputValue === '-') {
+		if (Object.values(exceptions).includes(displayEl.value)) {
+			displayEl.value = '-';
+			return;
+		}
+		if (displayEl.value === '0') {
+			displayEl.value = '-';
+			return;
+		}
+	}
+
+	if (inputValue === 'backspace') {
+		if (Object.values(exceptions).includes(displayEl.value)) {
+			displayEl.value = '0';
+			return;
+		}
+		if (displayEl.value.length === 1) {
+			displayEl.value = '0';
+			return;
+		}
+		displayEl.value = displayEl.value.slice(0, -1);
+		return;
+	}
 
 	if (inputValue === '=') {
 		calculate();
 		return;
 	}
 
-	if (['+', '-', '*', '/', '%'].includes(inputValue)) return;
+	if (['+', '-', '*', '/', '%'].includes(inputValue)) {
+		if (Object.values(exceptions).includes(displayEl.value)) return;
+		const lastChar = displayEl.value.slice(-1);
+
+		if (['+', '-', '*', '/', '%'].includes(lastChar)) {
+			displayEl.value = displayEl.value.slice(0, -1) + inputValue;
+			return;
+		}
+
+		if (displayEl.value === '0') return;
+
+		displayEl.value += inputValue;
+		return;
+	}
 
 	if (inputValue === '(' || inputValue === ')') return;
 };
