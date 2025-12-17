@@ -204,14 +204,23 @@ body {
 	grid-column-end: 5;
 }
 
-
 .button {
+	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	background: var(--button);
 	border-radius: 6px;
 	cursor: pointer;
+}
+
+.counter {
+	position: absolute;
+	bottom: 6px;
+	left: 55px;
+	transform: translateX(-50%);
+	font-size: 12px;
+	display: none;
 }
 
 .button_burger:hover,

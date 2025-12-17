@@ -1,5 +1,6 @@
 const buttonEls = [ ...document.querySelectorAll('.button') ];
 const displayEl = document.querySelector('.display');
+displayEl.value = '0'
 
 const exceptions = {
 	divisionByZero: 'Деление на ноль',
@@ -53,6 +54,21 @@ const clear = () => {
 	displayEl.value = '0';
 }
 
+const isOperatorChar = (char) => {
+	return ['+', '-', '*', '/', '%'].includes(char);
+}
+
+const getCurrentNumber = (displayValue) => {
+	const parts = displayValue.split(/[+\-*/%()]/);
+	return parts[parts.length - 1];
+}
+
+const hasUnclosedOpeningParen = (value) => {
+	const open = displayEl.value.split('(').length - 1;
+	const close = displayEl.value.split(')').length - 1;
+	return open > close;
+}
+
 const calculate = () => {
 
 }
@@ -66,11 +82,13 @@ const inputHandler = e => {
 		return;
 	}
 
+	const isExceptionShown = Object.values(exceptions).includes(displayEl.value);
+
+	if (isExceptionShown) {
+		displayEl.value = '0';
+	}
+
 	if (typeof inputValue === 'number') {
-		if (Object.values(exceptions).includes(displayEl.value)) {
-			displayEl.value = String(inputValue);
-			return;
-		}
 		if (displayEl.value === '0') {
 			displayEl.value = String(inputValue);
 			return;
@@ -80,20 +98,18 @@ const inputHandler = e => {
 	}
 
 	if (inputValue === '.') {
-		if (Object.values(exceptions).includes(displayEl.value)) {
+		const currentNumber = getCurrentNumber(displayEl.value);
+
+		if (currentNumber.includes('.')) return;
+		if (displayEl.value === '0') {
 			displayEl.value = '0.';
 			return;
 		}
-		if (displayEl.value.includes('.')) return;
 		displayEl.value += '.';
 		return;
 	}
 
 	if (inputValue === '-') {
-		if (Object.values(exceptions).includes(displayEl.value)) {
-			displayEl.value = '-';
-			return;
-		}
 		if (displayEl.value === '0') {
 			displayEl.value = '-';
 			return;
@@ -101,10 +117,6 @@ const inputHandler = e => {
 	}
 
 	if (inputValue === 'backspace') {
-		if (Object.values(exceptions).includes(displayEl.value)) {
-			displayEl.value = '0';
-			return;
-		}
 		if (displayEl.value.length === 1) {
 			displayEl.value = '0';
 			return;
@@ -119,10 +131,11 @@ const inputHandler = e => {
 	}
 
 	if (['+', '-', '*', '/', '%'].includes(inputValue)) {
-		if (Object.values(exceptions).includes(displayEl.value)) return;
-		const lastChar = displayEl.value.slice(-1);
 
-		if (['+', '-', '*', '/', '%'].includes(lastChar)) {
+		const lastChar = displayEl.value.slice(-1);
+		const isOperator = isOperatorChar(lastChar);
+
+		if (isOperator) {
 			displayEl.value = displayEl.value.slice(0, -1) + inputValue;
 			return;
 		}
@@ -133,7 +146,36 @@ const inputHandler = e => {
 		return;
 	}
 
-	if (inputValue === '(' || inputValue === ')') return;
+	if (inputValue === '(' || inputValue === ')') {
+		const lastChar = displayEl.value.slice(-1);
+		const isOperator = isOperatorChar(lastChar);
+		const isDigit = (char) => /\d/.test(char);
+
+		if (inputValue === '(') {
+			if (displayEl.value === '0') {
+				displayEl.value = '(';
+				return;
+			}
+			if (isOperator || lastChar === '(') {
+				displayEl.value += '(';
+				return;
+			}
+			if (isDigit(lastChar) || lastChar === ')') {
+				displayEl.value += '*(';
+				return;
+			}
+			return;
+		}
+
+		if (inputValue === ')') {
+			if (displayEl.value === '0') return;
+			if (isOperator) return;
+			if (!hasUnclosedOpeningParen(displayEl.value)) return;
+
+			displayEl.value += ')';
+			return;
+		}
+	}
 };
 
 buttonEls.forEach(buttonEl => {
