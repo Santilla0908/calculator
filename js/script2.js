@@ -64,8 +64,8 @@ const getCurrentNumber = (displayValue) => {
 }
 
 const hasUnclosedOpeningParen = (value) => {
-	const open = displayEl.value.split('(').length - 1;
-	const close = displayEl.value.split(')').length - 1;
+	const open = value.split('(').length - 1;
+	const close = value.split(')').length - 1;
 	return open > close;
 }
 
