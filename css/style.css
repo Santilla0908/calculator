@@ -214,13 +214,12 @@ body {
 	cursor: pointer;
 }
 
-.counter {
+.opened_parenthesis_counter {
 	position: absolute;
 	bottom: 6px;
 	left: 55px;
 	transform: translateX(-50%);
 	font-size: 12px;
-	display: none;
 }
 
 .button_burger:hover,

@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c65bb491-84e4-4c74-bf32-cab5d4ccc3f3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/script2.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/script2.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,6 +21,9 @@
         <option value="JavaScript File" />
       </list>
     </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,6 +49,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -65,7 +71,8 @@
       <workItem from="1765642713467" duration="6784000" />
       <workItem from="1765801177161" duration="7593000" />
       <workItem from="1765877861819" duration="9475000" />
-      <workItem from="1765966509587" duration="9913000" />
+      <workItem from="1765966509587" duration="24424000" />
+      <workItem from="1766047771247" duration="7852000" />
     </task>
     <servers />
   </component>

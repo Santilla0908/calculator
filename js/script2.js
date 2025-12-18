@@ -1,6 +1,25 @@
 const buttonEls = [ ...document.querySelectorAll('.button') ];
 const displayEl = document.querySelector('.display');
-displayEl.value = '0'
+const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_counter');
+
+const defaultInputValue = '0';
+const operators = [ '+', '-', '*', '/', '%' ];
+
+const isOperator = char => operators.includes(char);
+
+const hasUnclosedOpeningParenthesis = inputValue => {
+	const open = inputValue.split('(').length - 1;
+	const close = inputValue.split(')').length - 1;
+	return open > close;
+}
+
+const clear = () => {
+	displayEl.value = defaultInputValue;
+	openedParenthesisCounterEl.innerText = '0';
+	openedParenthesisCounterEl.classList.add('hidden');
+}
+
+clear();
 
 const exceptions = {
 	divisionByZero: 'Деление на ноль',
@@ -50,58 +69,58 @@ const getInputValue = e => {
 	return number;
 }
 
-const clear = () => {
-	displayEl.value = '0';
-}
-
-const isOperatorChar = (char) => {
-	return ['+', '-', '*', '/', '%'].includes(char);
-}
-
-const getCurrentNumber = (displayValue) => {
-	const parts = displayValue.split(/[+\-*/%()]/);
-	return parts[parts.length - 1];
-}
-
-const hasUnclosedOpeningParen = (value) => {
-	const open = value.split('(').length - 1;
-	const close = value.split(')').length - 1;
-	return open > close;
-}
-
 const calculate = () => {
 
 }
 
 const inputHandler = e => {
+	const value = displayEl.value;
+
+	const isExceptionShown = Object.values(exceptions).includes(value);
+	if (isExceptionShown) clear();
+
 	const inputValue = getInputValue(e);
 	if (inputValue === null) return;
 
-	if (inputValue === 'clear') {
-		clear();
-		return;
+	if (inputValue === 'clear') return clear();
+
+	if (inputValue === 'backspace' && value.length <= 1) return clear();
+
+	const lastInputNumber = (() => {
+		const parts = displayEl.value.split(/[+\-*/%()]/);
+		return parts[parts.length - 1];
+	})();
+	if (inputValue === '.' && lastInputNumber.includes('.')) return;
+
+	if (value === defaultInputValue) {
+		if (inputValue === ')') return;
+		if (inputValue === '-') return displayEl.value = '-';
+		if (isOperator(inputValue)) return;
 	}
 
-	const isExceptionShown = Object.values(exceptions).includes(displayEl.value);
-
-	if (isExceptionShown) {
-		displayEl.value = '0';
+	if (inputValue === ')') {
+		if (isOperator(value.slice(-1))) return;
+		if (!hasUnclosedOpeningParenthesis(value)) return;
 	}
+
+	displayEl.value = (() => {
+		if (inputValue === 'backspace') return value.slice(0, -1);
+		if (inputValue === '=') return calculate();
+		if (inputValue === ')') return value + ')';
+		return value;
+	})();
 
 	if (typeof inputValue === 'number') {
-		if (displayEl.value === '0') {
-			displayEl.value = String(inputValue);
+		if (displayEl.value === defaultInputValue) {
+			displayEl.value = inputValue;
 			return;
 		}
-		displayEl.value += inputValue
+		displayEl.value += inputValue;
 		return;
 	}
 
 	if (inputValue === '.') {
-		const currentNumber = getCurrentNumber(displayEl.value);
-
-		if (currentNumber.includes('.')) return;
-		if (displayEl.value === '0') {
+		if (displayEl.value === defaultInputValue) {
 			displayEl.value = '0.';
 			return;
 		}
@@ -109,71 +128,30 @@ const inputHandler = e => {
 		return;
 	}
 
-	if (inputValue === '-') {
-		if (displayEl.value === '0') {
-			displayEl.value = '-';
-			return;
-		}
-	}
-
-	if (inputValue === 'backspace') {
-		if (displayEl.value.length === 1) {
-			displayEl.value = '0';
-			return;
-		}
-		displayEl.value = displayEl.value.slice(0, -1);
-		return;
-	}
-
-	if (inputValue === '=') {
-		calculate();
-		return;
-	}
-
-	if (['+', '-', '*', '/', '%'].includes(inputValue)) {
-
-		const lastChar = displayEl.value.slice(-1);
-		const isOperator = isOperatorChar(lastChar);
-
-		if (isOperator) {
+	if (isOperator(inputValue)) {
+		const lastChar = value.slice(-1);
+		if (isOperator(lastChar)) {
 			displayEl.value = displayEl.value.slice(0, -1) + inputValue;
 			return;
 		}
-
-		if (displayEl.value === '0') return;
-
 		displayEl.value += inputValue;
 		return;
 	}
 
-	if (inputValue === '(' || inputValue === ')') {
-		const lastChar = displayEl.value.slice(-1);
-		const isOperator = isOperatorChar(lastChar);
+	if (inputValue === '(') {
+		const lastChar = value.slice(-1);
+		const isOperatorChar = isOperator(lastChar);
 		const isDigit = (char) => /\d/.test(char);
-
-		if (inputValue === '(') {
-			if (displayEl.value === '0') {
-				displayEl.value = '(';
-				return;
-			}
-			if (isOperator || lastChar === '(') {
-				displayEl.value += '(';
-				return;
-			}
-			if (isDigit(lastChar) || lastChar === ')') {
-				displayEl.value += '*(';
-				return;
-			}
+		if (displayEl.value === defaultInputValue) {
+			displayEl.value = '(';
 			return;
 		}
-
-		if (inputValue === ')') {
-			if (displayEl.value === '0') return;
-			if (isOperator) return;
-			if (!hasUnclosedOpeningParen(displayEl.value)) return;
-
-			displayEl.value += ')';
+		if (isOperatorChar || lastChar === '(') {
+			displayEl.value += '(';
 			return;
+		}
+		if (isDigit(lastChar) || lastChar === ')') {
+			displayEl.value += '*(';
 		}
 	}
 };
