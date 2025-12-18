@@ -4,19 +4,29 @@ const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_c
 
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/', '%' ];
+const maxNumberLength = 20;
 
 const isOperator = char => operators.includes(char);
 
 const hasUnclosedOpeningParenthesis = inputValue => {
 	const open = inputValue.split('(').length - 1;
 	const close = inputValue.split(')').length - 1;
-	return open > close;
+	return Math.max(0, open - close);
 }
+
+const updateParenthesisCounter = () => {
+	const count = hasUnclosedOpeningParenthesis(displayEl.value);
+	if (count === 0) {
+		openedParenthesisCounterEl.classList.add('hidden');
+	} else {
+		openedParenthesisCounterEl.classList.remove('hidden');
+	}
+	openedParenthesisCounterEl.innerText = count;
+};
 
 const clear = () => {
 	displayEl.value = defaultInputValue;
-	openedParenthesisCounterEl.innerText = '0';
-	openedParenthesisCounterEl.classList.add('hidden');
+	updateParenthesisCounter();
 }
 
 clear();
@@ -79,47 +89,56 @@ const inputHandler = e => {
 	const isExceptionShown = Object.values(exceptions).includes(value);
 	if (isExceptionShown) clear();
 
-	const inputValue = getInputValue(e);
-	if (inputValue === null) return;
+	const userInput = getInputValue(e);
+	if (userInput === null) return;
 
-	if (inputValue === 'clear') return clear();
+	if (userInput === 'clear') return clear();
 
-	if (inputValue === 'backspace' && value.length <= 1) return clear();
+	if (userInput === 'backspace' && value.length <= 1) return clear();
 
 	const lastInputNumber = (() => {
 		const parts = displayEl.value.split(/[+\-*/%()]/);
 		return parts[parts.length - 1];
 	})();
-	if (inputValue === '.' && lastInputNumber.includes('.')) return;
 
-	if (value === defaultInputValue) {
-		if (inputValue === ')') return;
-		if (inputValue === '-') return displayEl.value = '-';
-		if (isOperator(inputValue)) return;
+	if (lastInputNumber.length >= maxNumberLength) {
+		if (typeof userInput === 'number') return;
+		if (userInput === '.') return;
+		if (userInput === '(') return;
+		if (isOperator(userInput)) return;
 	}
 
-	if (inputValue === ')') {
+	if (userInput === '.' && lastInputNumber.includes('.')) return;
+
+	if (value === defaultInputValue) {
+		if (userInput === ')') return;
+		if (userInput === '-') return displayEl.value = '-';
+		if (isOperator(userInput)) return;
+	}
+
+	if (userInput === ')') {
 		if (isOperator(value.slice(-1))) return;
 		if (!hasUnclosedOpeningParenthesis(value)) return;
 	}
 
 	displayEl.value = (() => {
-		if (inputValue === 'backspace') return value.slice(0, -1);
-		if (inputValue === '=') return calculate();
-		if (inputValue === ')') return value + ')';
+		if (userInput === 'backspace') return value.slice(0, -1);
+		if (userInput === '=') return calculate();
+		if (userInput === ')') return displayEl.value + ')';
 		return value;
 	})();
+	updateParenthesisCounter();
 
-	if (typeof inputValue === 'number') {
+	if (typeof userInput === 'number') {
 		if (displayEl.value === defaultInputValue) {
-			displayEl.value = inputValue;
+			displayEl.value = userInput;
 			return;
 		}
-		displayEl.value += inputValue;
+		displayEl.value += userInput;
 		return;
 	}
 
-	if (inputValue === '.') {
+	if (userInput === '.') {
 		if (displayEl.value === defaultInputValue) {
 			displayEl.value = '0.';
 			return;
@@ -128,30 +147,33 @@ const inputHandler = e => {
 		return;
 	}
 
-	if (isOperator(inputValue)) {
+	if (isOperator(userInput)) {
 		const lastChar = value.slice(-1);
 		if (isOperator(lastChar)) {
-			displayEl.value = displayEl.value.slice(0, -1) + inputValue;
+			displayEl.value = displayEl.value.slice(0, -1) + userInput;
 			return;
 		}
-		displayEl.value += inputValue;
+		displayEl.value += userInput;
 		return;
 	}
 
-	if (inputValue === '(') {
+	if (userInput === '(') {
 		const lastChar = value.slice(-1);
 		const isOperatorChar = isOperator(lastChar);
 		const isDigit = (char) => /\d/.test(char);
 		if (displayEl.value === defaultInputValue) {
 			displayEl.value = '(';
+			updateParenthesisCounter();
 			return;
 		}
 		if (isOperatorChar || lastChar === '(') {
 			displayEl.value += '(';
+			updateParenthesisCounter();
 			return;
 		}
 		if (isDigit(lastChar) || lastChar === ')') {
 			displayEl.value += '*(';
+			updateParenthesisCounter();
 		}
 	}
 };

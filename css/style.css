@@ -5,11 +5,11 @@
 }
 
 :root {
-	--bg:#000000;
-	--calculator_bg:rgb(20, 20, 20);
-	--button:rgb(50, 50, 50);
-	--button_hover:rgb(70, 70, 70);
-	--text:#ffff;
+	--bg: #000000;
+	--calculator_bg: rgb(20, 20, 20);
+	--button: rgb(50, 50, 50);
+	--button_hover: rgb(70, 70, 70);
+	--text: #ffff;
 	--border: #111827;
 }
 
@@ -23,7 +23,7 @@ body {
 	align-items: center;
 	padding: 50px 0;
 	margin: 0;
-	font-family:Inter, Roboto, Arial, sans-serif;
+	font-family: Inter, Roboto, Arial, sans-serif;
 	background: var(--bg);
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -199,7 +199,7 @@ body {
 }
 
 .backspace,
-.equals{
+.equals {
 	grid-column-start: 3;
 	grid-column-end: 5;
 }
@@ -220,6 +220,10 @@ body {
 	left: 55px;
 	transform: translateX(-50%);
 	font-size: 12px;
+}
+
+.opened_parenthesis_counter.hidden {
+	display: none;
 }
 
 .button_burger:hover,

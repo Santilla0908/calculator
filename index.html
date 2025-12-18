@@ -1,88 +1,88 @@
 <!doctype html>
 <html lang="ru">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport"
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
 		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<title>Калькулятор</title>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-		<link rel="stylesheet" href="./css/style.css">
-		
-		<script src="https://cdn.jsdelivr.net/npm/big.js@7.0.1/big.min.js"></script>
-		<script src="js/script2.js" defer></script>
-	</head>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Калькулятор</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+	<link rel="stylesheet" href="./css/style.css">
 	
-	<body>
-		<div class="container">
-			<header class="header">
-				<div class="button_burger">
-					<span class="burger_inner"></span>
-				</div>
-				<h1 class="calculator_header">Калькулятор</h1>
-				
-				<div class="button log_open" title="Журнал">
-					<span class="material-symbols-outlined">history</span>
-				</div>
-			</header>
-			
-			<div class="calculator">
-				<div class="history_display"></div>
-				<label><input name="text" type="text" class="display"></label>
-				
-				<div class="log_items">
-					<div class="log_item"></div>
-					<div class="button log_delete">
-						<span class="material-symbols-outlined icon">delete</span>
-					</div>
-				</div>
-				
-				<div class="buttons">
-					<div class="button reset" data-action="clear" data-value="clear" title="сброс">Сброс</div>
-					
-					<div class="button backspace" data-action="backspace" data-value="backspace" title="удалить">←</div>
-					
-					<div class="button" data-action="digit" data-value="7" title="7">7</div>
-					
-					<div class="button" data-action="digit" data-value="8" title="8">8</div>
-					
-					<div class="button" data-action="digit" data-value="9" title="9">9</div>
-					
-					<div class="button" data-action="operator" data-value="/" title="разделить">/</div>
-					
-					<div class="button" data-action="digit" data-value="4" title="4">4</div>
-					
-					<div class="button" data-action="digit" data-value="5" title="5">5</div>
-					
-					<div class="button" data-action="digit" data-value="6" title="6">6</div>
-					
-					<div class="button" data-action="operator" data-value="*" title="умножить">*</div>
-					
-					<div class="button" data-action="digit" data-value="1" title="1">1</div>
-					
-					<div class="button" data-action="digit" data-value="2" title="2">2</div>
-					
-					<div class="button" data-action="digit" data-value="3" title="3">3</div>
-					
-					<div class="button" data-action="operator" data-value="-" title="вычесть">-</div>
-					
-					<div class="button" data-action="digit" data-value="0" title="0">0</div>
-					
-					<div class="button" data-action="digit" data-value="." title="точка">.</div>
-					
-					<div class="button" data-action="percent" title="процент">%</div>
-					
-					<div class="button" data-action="operator" data-value="+" title="прибавить">+</div>
-					
-					<div class="button" data-action="bracket" data-value="(" title="открывающая скобка">(
-						<span class="opened_parenthesis_counter">0</span>
-					</div>
-					
-					<div class="button" data-action="bracket" data-value=")" title="закрывающая скобка">)</div>
-					
-					<div class="button equals" data-action="equals" title="равно">=</div>
-				</div>
+	<script src="https://cdn.jsdelivr.net/npm/big.js@7.0.1/big.min.js"></script>
+	<script src="js/script2.js" defer></script>
+</head>
+
+<body>
+<div class="container">
+	<header class="header">
+		<div class="button_burger">
+			<span class="burger_inner"></span>
+		</div>
+		<h1 class="calculator_header">Калькулятор</h1>
+		
+		<div class="button log_open" title="Журнал">
+			<span class="material-symbols-outlined">history</span>
+		</div>
+	</header>
+	
+	<div class="calculator">
+		<div class="history_display"></div>
+		<label><input name="text" type="text" class="display"></label>
+		
+		<div class="log_items">
+			<div class="log_item"></div>
+			<div class="button log_delete">
+				<span class="material-symbols-outlined icon">delete</span>
 			</div>
 		</div>
-	</body>
+		
+		<div class="buttons">
+			<div class="button reset" data-action="clear" data-value="clear" title="сброс">Сброс</div>
+			
+			<div class="button backspace" data-action="backspace" data-value="backspace" title="удалить">←</div>
+			
+			<div class="button" data-action="digit" data-value="7" title="7">7</div>
+			
+			<div class="button" data-action="digit" data-value="8" title="8">8</div>
+			
+			<div class="button" data-action="digit" data-value="9" title="9">9</div>
+			
+			<div class="button" data-action="operator" data-value="/" title="разделить">/</div>
+			
+			<div class="button" data-action="digit" data-value="4" title="4">4</div>
+			
+			<div class="button" data-action="digit" data-value="5" title="5">5</div>
+			
+			<div class="button" data-action="digit" data-value="6" title="6">6</div>
+			
+			<div class="button" data-action="operator" data-value="*" title="умножить">*</div>
+			
+			<div class="button" data-action="digit" data-value="1" title="1">1</div>
+			
+			<div class="button" data-action="digit" data-value="2" title="2">2</div>
+			
+			<div class="button" data-action="digit" data-value="3" title="3">3</div>
+			
+			<div class="button" data-action="operator" data-value="-" title="вычесть">-</div>
+			
+			<div class="button" data-action="digit" data-value="0" title="0">0</div>
+			
+			<div class="button" data-action="digit" data-value="." title="точка">.</div>
+			
+			<div class="button" data-action="percent" title="процент">%</div>
+			
+			<div class="button" data-action="operator" data-value="+" title="прибавить">+</div>
+			
+			<div class="button" data-action="bracket" data-value="(" title="открывающая скобка">(
+				<span class="opened_parenthesis_counter"></span>
+			</div>
+			
+			<div class="button" data-action="bracket" data-value=")" title="закрывающая скобка">)</div>
+			
+			<div class="button equals" data-action="equals" title="равно">=</div>
+		</div>
+	</div>
+</div>
+</body>
 </html>
