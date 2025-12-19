@@ -159,14 +159,13 @@ const inputHandler = e => {
 
 	if (userInput === '(') {
 		const lastChar = inputValue.slice(-1);
-		const isOperatorChar = isOperator(lastChar);
 		const isDigit = (char) => /\d/.test(char);
 		if (displayEl.value === defaultInputValue) {
 			displayEl.value = '(';
 			updateParenthesisCounter();
 			return;
 		}
-		if (isOperatorChar || lastChar === '(') {
+		if (isOperator(lastChar) || lastChar === '(') {
 			displayEl.value += '(';
 			updateParenthesisCounter();
 			return;
