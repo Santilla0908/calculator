@@ -11,7 +11,7 @@ const isOperator = char => operators.includes(char);
 const hasUnclosedOpeningParenthesis = inputValue => {
 	const open = inputValue.split('(').length - 1;
 	const close = inputValue.split(')').length - 1;
-	return Math.max(0, open - close);
+	return open - close;
 }
 
 const updateParenthesisCounter = () => {
@@ -84,9 +84,9 @@ const calculate = () => {
 }
 
 const inputHandler = e => {
-	const value = displayEl.value;
+	const inputValue = displayEl.value;
 
-	const isExceptionShown = Object.values(exceptions).includes(value);
+	const isExceptionShown = Object.values(exceptions).includes(inputValue);
 	if (isExceptionShown) clear();
 
 	const userInput = getInputValue(e);
@@ -94,7 +94,7 @@ const inputHandler = e => {
 
 	if (userInput === 'clear') return clear();
 
-	if (userInput === 'backspace' && value.length <= 1) return clear();
+	if (userInput === 'backspace' && inputValue.length <= 1) return clear();
 
 	const lastInputNumber = (() => {
 		const parts = displayEl.value.split(/[+\-*/%()]/);
@@ -110,22 +110,22 @@ const inputHandler = e => {
 
 	if (userInput === '.' && lastInputNumber.includes('.')) return;
 
-	if (value === defaultInputValue) {
+	if (inputValue === defaultInputValue) {
 		if (userInput === ')') return;
 		if (userInput === '-') return displayEl.value = '-';
 		if (isOperator(userInput)) return;
 	}
 
 	if (userInput === ')') {
-		if (isOperator(value.slice(-1))) return;
-		if (!hasUnclosedOpeningParenthesis(value)) return;
+		if (isOperator(inputValue.slice(-1))) return;
+		if (!hasUnclosedOpeningParenthesis(inputValue)) return;
 	}
 
 	displayEl.value = (() => {
-		if (userInput === 'backspace') return value.slice(0, -1);
+		if (userInput === 'backspace') return inputValue.slice(0, -1);
 		if (userInput === '=') return calculate();
 		if (userInput === ')') return displayEl.value + ')';
-		return value;
+		return inputValue;
 	})();
 	updateParenthesisCounter();
 
@@ -148,7 +148,7 @@ const inputHandler = e => {
 	}
 
 	if (isOperator(userInput)) {
-		const lastChar = value.slice(-1);
+		const lastChar = inputValue.slice(-1);
 		if (isOperator(lastChar)) {
 			displayEl.value = displayEl.value.slice(0, -1) + userInput;
 			return;
@@ -158,7 +158,7 @@ const inputHandler = e => {
 	}
 
 	if (userInput === '(') {
-		const lastChar = value.slice(-1);
+		const lastChar = inputValue.slice(-1);
 		const isOperatorChar = isOperator(lastChar);
 		const isDigit = (char) => /\d/.test(char);
 		if (displayEl.value === defaultInputValue) {
