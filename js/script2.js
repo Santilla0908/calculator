@@ -75,8 +75,42 @@ const getInputValue = e => {
 	return number;
 }
 
-const calculate = () => {
+const tokenize = input => {
+	const tokens = [];
+	let numberBuffer = '';
 
+	for (const char of input) {
+		if ((char >= '0' && char <= '9') || char === '.') {
+			numberBuffer += char;
+			continue;
+		}
+		if (numberBuffer) {
+			tokens.push(parseInt(numberBuffer));
+			numberBuffer = '';
+		}
+		tokens.push(char);
+	}
+
+	if (numberBuffer) {
+		tokens.push(parseInt(numberBuffer));
+	}
+
+	return tokens;
+}
+
+const calculate = () => {
+	const inputValue = displayEl.value;
+
+	if (isOperator(inputValue.slice(-1))) return inputValue;
+
+	let normalizedInput = inputValue;
+	const unclosed = getUnclosedParenthesisCount(inputValue);
+
+	if (unclosed > 0) {
+		normalizedInput += ')'.repeat(unclosed);
+	}
+
+	const tokens = tokenize(normalizedInput);
 }
 
 const inputHandler = e => {
