@@ -8,6 +8,8 @@ const maxNumberLength = 15;
 
 const isOperator = char => operators.includes(char);
 
+const isNumber = token => !isNaN(token) && token !== '';
+
 const getUnclosedParenthesisCount = inputValue => {
 	const open = inputValue.split('(').length - 1;
 	const close = inputValue.split(')').length - 1;
@@ -85,17 +87,57 @@ const tokenize = input => {
 			continue;
 		}
 		if (numberBuffer) {
-			tokens.push(parseInt(numberBuffer));
+			tokens.push(numberBuffer);
 			numberBuffer = '';
 		}
 		tokens.push(char);
 	}
 
 	if (numberBuffer) {
-		tokens.push(parseInt(numberBuffer));
+		tokens.push(numberBuffer);
 	}
 
 	return tokens;
+}
+
+const convertToReversePolishNotation = tokens => {
+	const output = [];
+	const operatorStack = [];
+	const precedence = {
+		'+': 1,
+		'-': 1,
+		'*': 2,
+		'/': 2
+	};
+
+	for (const token of tokens) {
+		if (isNumber(token)) {
+			output.push(token);
+			continue;
+		}
+		if (isOperator(token)) {
+			while (operatorStack.length && isOperator(operatorStack.at(-1)) && precedence[operatorStack.at(-1)] >= precedence[token]) {
+				output.push(operatorStack.pop());
+			}
+			operatorStack.push(token);
+			continue;
+		}
+		if (token === '(') {
+			operatorStack.push(token);
+			continue;
+		}
+		if (token === ')') {
+			while (operatorStack.length && operatorStack.at(-1) !== '(') {
+				output.push(operatorStack.pop());
+			}
+			operatorStack.pop();
+		}
+	}
+	while (operatorStack.length) {
+		output.push(operatorStack.pop());
+	}
+
+	return output;
 }
 
 const calculate = () => {
