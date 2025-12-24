@@ -4,11 +4,10 @@ const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_c
 
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/', '%' ];
-const maxNumberLength = 15;
 
 const isOperator = char => operators.includes(char);
 
-const isNumber = token => !isNaN(token) && token !== '';
+const isNumber = token => !isNaN(parseFloat(token)) && isFinite(token);
 
 const getUnclosedParenthesisCount = inputValue => {
 	const open = inputValue.split('(').length - 1;
@@ -107,7 +106,8 @@ const convertToReversePolishNotation = tokens => {
 		'+': 1,
 		'-': 1,
 		'*': 2,
-		'/': 2
+		'/': 2,
+		'%': 2
 	};
 
 	for (const token of tokens) {
@@ -140,6 +140,49 @@ const convertToReversePolishNotation = tokens => {
 	return output;
 }
 
+const calculateWithPriority = tokens => {
+	const stack = [];
+
+	for (const token of tokens) {
+		if (isNumber(token)) {
+			stack.push(new Big(token));
+			continue;
+		}
+		if (isOperator(token)) {
+			const secondOperand = stack.pop();
+			const firstOperand = stack.pop();
+
+			if (!secondOperand || !firstOperand) return;
+
+			let result;
+
+			switch (token) {
+				case '+':
+					result = firstOperand.plus(secondOperand);
+					break;
+				case '-':
+					result = firstOperand.minus(secondOperand);
+					break;
+				case '*':
+					result = firstOperand.times(secondOperand);
+					break;
+				case '%':
+					result = firstOperand.mod(secondOperand);
+					break;
+				case '/':
+					if (secondOperand.eq(0)) return exceptions.divisionByZero;
+					result = firstOperand.div(secondOperand);
+					break;
+			}
+			const resultStr = result.toString();
+			if (resultStr.includes('e')) return exceptions.numberTooLong;
+			stack.push(result);
+		}
+	}
+	if (stack.length !== 1) return;
+	return stack[0].toString();
+};
+
 const calculate = () => {
 	const inputValue = displayEl.value;
 
@@ -153,7 +196,16 @@ const calculate = () => {
 	}
 
 	const tokens = tokenize(normalizedInput);
-}
+	const rpn = convertToReversePolishNotation(tokens);
+	const result = calculateWithPriority(rpn);
+
+	if (result !== undefined) {
+		displayEl.value = result;
+		updateParenthesisCounter();
+	}
+
+	return result;
+};
 
 const inputHandler = e => {
 	const inputValue = displayEl.value;
@@ -172,13 +224,6 @@ const inputHandler = e => {
 		const parts = displayEl.value.split(/[+\-*/%()]/);
 		return parts[parts.length - 1];
 	})();
-
-	if (lastInputNumber.length >= maxNumberLength) {
-		if (typeof userInput === 'number') return;
-		if (userInput === '.') return;
-		if (userInput === '(') return;
-		if (isOperator(userInput)) return;
-	}
 
 	if (userInput === '.' && lastInputNumber.includes('.')) return;
 
