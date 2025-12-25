@@ -3,7 +3,7 @@ const displayEl = document.querySelector('.display');
 const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_counter');
 
 const defaultInputValue = '0';
-const operators = [ '+', '-', '*', '/', '%' ];
+const operators = [ '+', '-', '*', '/' ];
 
 const isOperator = char => operators.includes(char);
 
@@ -99,6 +99,40 @@ const tokenize = input => {
 	return tokens;
 }
 
+const normalizeUnaryMinus = tokens => {
+	const result = [];
+
+	for (let i = 0; i < tokens.length; i++) {
+		const currentToken = tokens[i];
+		const previousToken = tokens[i - 1];
+
+		const isUnaryMinus = currentToken === '-' && (i === 0 || isOperator(previousToken) || previousToken === '(');
+		if (isUnaryMinus) {
+			result.push('0');
+		}
+		result.push(currentToken);
+	}
+	return result;
+};
+
+const normalizePercent = tokens => {
+	const result = [];
+
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i];
+		const next = tokens[i + 1];
+		console.log('CHECK', token, isNumber(token), next);
+		if (isNumber(token) && next === '%') {
+			const percentValue = new Big(token).div(100).toString();
+			result.push(percentValue);
+			i++;
+			continue;
+		}
+		result.push(token);
+	}
+	return result;
+};
+
 const convertToReversePolishNotation = tokens => {
 	const output = [];
 	const operatorStack = [];
@@ -166,9 +200,6 @@ const calculateWithPriority = tokens => {
 				case '*':
 					result = firstOperand.times(secondOperand);
 					break;
-				case '%':
-					result = firstOperand.mod(secondOperand);
-					break;
 				case '/':
 					if (secondOperand.eq(0)) return exceptions.divisionByZero;
 					result = firstOperand.div(secondOperand);
@@ -195,9 +226,18 @@ const calculate = () => {
 		normalizedInput += ')'.repeat(unclosed);
 	}
 
-	const tokens = tokenize(normalizedInput);
+	console.log('input string:', normalizedInput);
+	let tokens = tokenize(normalizedInput);
+	console.log('tokens:', tokens);
+	tokens = normalizeUnaryMinus(tokens);
+	console.log('unary:', tokens);
+	tokens = normalizePercent(tokens);
+	console.log('percent:', tokens);
+
 	const rpn = convertToReversePolishNotation(tokens);
+	console.log('RPN:', rpn);
 	const result = calculateWithPriority(rpn);
+	console.log('result:', result);
 
 	if (result !== undefined) {
 		displayEl.value = result;
@@ -211,7 +251,7 @@ const inputHandler = e => {
 	const inputValue = displayEl.value;
 
 	const isExceptionShown = Object.values(exceptions).includes(inputValue);
-	if (isExceptionShown) clear();
+	if (isExceptionShown) return clear();
 
 	const userInput = getInputValue(e);
 	if (userInput === null) return;
@@ -226,6 +266,8 @@ const inputHandler = e => {
 	})();
 
 	if (userInput === '.' && lastInputNumber.includes('.')) return;
+
+	if (userInput === '%' && !isNumber(inputValue.slice(-1))) return;
 
 	if (inputValue === defaultInputValue) {
 		if (userInput === ')') return;
@@ -247,7 +289,12 @@ const inputHandler = e => {
 		if (userInput === '=') return calculate();
 		if (userInput === ')') return displayEl.value + ')';
 		if (typeof userInput === 'number') return displayEl.value + userInput;
-		if (userInput === '.') return displayEl.value += '.';
+		if (userInput === '.') return displayEl.value + '.';
+		if (userInput === '%') return displayEl.value + '%';
+		if (isOperator(userInput) && !isOperator(inputValue.slice(-1)) && getUnclosedParenthesisCount(inputValue) === 0) {
+			const result = calculate();
+			if (result !== undefined && !Object.values(exceptions).includes(result)) return result + userInput;
+		}
 		const lastChar = inputValue.slice(-1);
 		if (isOperator(userInput)) {
 			if (isOperator(lastChar)) return displayEl.value.slice(0, -1) + userInput;
