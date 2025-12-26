@@ -80,57 +80,39 @@ const tokenize = input => {
 	const tokens = [];
 	let numberBuffer = '';
 
-	for (const char of input) {
-		if ((char >= '0' && char <= '9') || char === '.') {
+	const pushNumberIfExists = () => {
+		if (!numberBuffer) return;
+		tokens.push(numberBuffer);
+		numberBuffer = '';
+	};
+
+	for (let i = 0; i < input.length; i++) {
+		const char = input[i];
+		const previousToken = tokens.at(-1);
+		const isDigit = char >= '0' && char <= '9';
+
+		if (isDigit || char === '.') {
 			numberBuffer += char;
 			continue;
 		}
-		if (numberBuffer) {
-			tokens.push(numberBuffer);
-			numberBuffer = '';
+		const isUnaryMinus = char === '-' && (i === 0 || isOperator(previousToken) || previousToken === '(');
+		if (isUnaryMinus) {
+			numberBuffer += '-';
+			continue;
+		}
+		pushNumberIfExists();
+
+		if (char === '%') {
+			const lastNumber = tokens.pop();
+			if (!isNumber(lastNumber)) return null;
+			const percentValue = new Big(lastNumber).div(100).toString();
+			tokens.push(percentValue);
+			continue;
 		}
 		tokens.push(char);
 	}
-
-	if (numberBuffer) {
-		tokens.push(numberBuffer);
-	}
-
+	pushNumberIfExists();
 	return tokens;
-}
-
-const normalizeUnaryMinus = tokens => {
-	const result = [];
-
-	for (let i = 0; i < tokens.length; i++) {
-		const currentToken = tokens[i];
-		const previousToken = tokens[i - 1];
-
-		const isUnaryMinus = currentToken === '-' && (i === 0 || isOperator(previousToken) || previousToken === '(');
-		if (isUnaryMinus) {
-			result.push('0');
-		}
-		result.push(currentToken);
-	}
-	return result;
-};
-
-const normalizePercent = tokens => {
-	const result = [];
-
-	for (let i = 0; i < tokens.length; i++) {
-		const token = tokens[i];
-		const next = tokens[i + 1];
-		console.log('CHECK', token, isNumber(token), next);
-		if (isNumber(token) && next === '%') {
-			const percentValue = new Big(token).div(100).toString();
-			result.push(percentValue);
-			i++;
-			continue;
-		}
-		result.push(token);
-	}
-	return result;
 };
 
 const convertToReversePolishNotation = tokens => {
@@ -140,8 +122,7 @@ const convertToReversePolishNotation = tokens => {
 		'+': 1,
 		'-': 1,
 		'*': 2,
-		'/': 2,
-		'%': 2
+		'/': 2
 	};
 
 	for (const token of tokens) {
@@ -186,7 +167,7 @@ const calculateWithPriority = tokens => {
 			const secondOperand = stack.pop();
 			const firstOperand = stack.pop();
 
-			if (!secondOperand || !firstOperand) return;
+			if (!secondOperand || !firstOperand) return null;
 
 			let result;
 
@@ -204,13 +185,15 @@ const calculateWithPriority = tokens => {
 					if (secondOperand.eq(0)) return exceptions.divisionByZero;
 					result = firstOperand.div(secondOperand);
 					break;
+				default:
+					return null;
 			}
 			const resultStr = result.toString();
 			if (resultStr.includes('e')) return exceptions.numberTooLong;
 			stack.push(result);
 		}
 	}
-	if (stack.length !== 1) return;
+	if (stack.length !== 1) return null;
 	return stack[0].toString();
 };
 
@@ -226,32 +209,25 @@ const calculate = () => {
 		normalizedInput += ')'.repeat(unclosed);
 	}
 
-	console.log('input string:', normalizedInput);
 	let tokens = tokenize(normalizedInput);
-	console.log('tokens:', tokens);
-	tokens = normalizeUnaryMinus(tokens);
-	console.log('unary:', tokens);
-	tokens = normalizePercent(tokens);
-	console.log('percent:', tokens);
+
+	if (tokens === null) return null;
 
 	const rpn = convertToReversePolishNotation(tokens);
-	console.log('RPN:', rpn);
 	const result = calculateWithPriority(rpn);
-	console.log('result:', result);
 
-	if (result !== undefined) {
-		displayEl.value = result;
-		updateParenthesisCounter();
-	}
-
+	if (result === null) return null;
+	displayEl.value = result;
+	updateParenthesisCounter();
 	return result;
 };
 
 const inputHandler = e => {
-	const inputValue = displayEl.value;
+	const originalInputValue = displayEl.value;
 
-	const isExceptionShown = Object.values(exceptions).includes(inputValue);
-	if (isExceptionShown) return clear();
+	const isExceptionShown = Object.values(exceptions).includes(originalInputValue);
+	if (isExceptionShown) clear();
+	const inputValue = displayEl.value;
 
 	const userInput = getInputValue(e);
 	if (userInput === null) return;
@@ -260,24 +236,30 @@ const inputHandler = e => {
 
 	if (userInput === 'backspace' && inputValue.length <= 1) return clear();
 
-	const lastInputNumber = (() => {
+	const lastNumericToken = (() => {
 		const parts = displayEl.value.split(/[+\-*/%()]/);
-		return parts[parts.length - 1];
+		return parts[parts.length - 1] || null;
 	})();
-
-	if (userInput === '.' && lastInputNumber.includes('.')) return;
+	if (userInput === '.' && lastNumericToken?.includes('.')) return;
 
 	if (userInput === '%' && !isNumber(inputValue.slice(-1))) return;
 
 	if (inputValue === defaultInputValue) {
-		if (userInput === ')') return;
-		if (userInput === '-') return displayEl.value = '-';
-		if (isOperator(userInput)) return;
-		if (typeof userInput === 'number') return displayEl.value = userInput;
-		if (userInput === '.') return displayEl.value = '0.';
-		if (userInput === '(') return displayEl.value = '(';
+		switch (userInput) {
+			case ')':
+			case '%':
+				return;
+			case '-':
+			case '(':
+				return displayEl.value = userInput;
+			case '.':
+				return displayEl.value = '0.';
+			default: {
+				if (isOperator(userInput)) return;
+				if (typeof userInput === 'number') return displayEl.value = userInput;
+			}
+		}
 	}
-	updateParenthesisCounter();
 
 	if (userInput === ')') {
 		if (isOperator(inputValue.slice(-1))) return;
@@ -285,28 +267,33 @@ const inputHandler = e => {
 	}
 
 	displayEl.value = (() => {
-		if (userInput === 'backspace') return inputValue.slice(0, -1);
-		if (userInput === '=') return calculate();
-		if (userInput === ')') return displayEl.value + ')';
-		if (typeof userInput === 'number') return displayEl.value + userInput;
-		if (userInput === '.') return displayEl.value + '.';
-		if (userInput === '%') return displayEl.value + '%';
-		if (isOperator(userInput) && !isOperator(inputValue.slice(-1)) && getUnclosedParenthesisCount(inputValue) === 0) {
-			const result = calculate();
-			if (result !== undefined && !Object.values(exceptions).includes(result)) return result + userInput;
+		switch (userInput) {
+			case ')':
+			case '.':
+			case '%':
+				return inputValue + userInput;
+			case 'backspace':
+				return inputValue.slice(0, -1);
+			case '=':
+				return calculate();
+			default: {
+				if (typeof userInput === 'number') return inputValue + userInput;
+				const lastChar = inputValue.slice(-1);
+				if (isOperator(userInput)) {
+					if (isOperator(lastChar)) return inputValue.slice(0, -1) + userInput;
+					if (getUnclosedParenthesisCount(inputValue)) return inputValue + userInput;
+					const result = calculate();
+					if (!Object.values(exceptions).includes(result)) return result + userInput;
+				}
+				if (userInput === '(') {
+					if (isOperator(lastChar) || lastChar === '(') return displayEl.value + '(';
+					if (isNumber(lastChar) || lastChar === ')') return displayEl.value + '*(';
+				}
+				return inputValue;
+			}
 		}
-		const lastChar = inputValue.slice(-1);
-		if (isOperator(userInput)) {
-			if (isOperator(lastChar)) return displayEl.value.slice(0, -1) + userInput;
-			return displayEl.value + userInput;
-		}
-		const isDigit = (char) => /\d/.test(char);
-		if (userInput === '(') {
-			if (isOperator(lastChar) || lastChar === '(') return displayEl.value + '(';
-			if (isDigit(lastChar) || lastChar === ')') return displayEl.value + '*(';
-		}
-		return inputValue;
 	})();
+
 	updateParenthesisCounter();
 };
 
