@@ -1,6 +1,7 @@
 const buttonEls = [ ...document.querySelectorAll('.button') ];
 const displayEl = document.querySelector('.display');
 const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_counter');
+const historyDisplayEl = document.querySelector('.history_display')
 
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/' ];
@@ -95,11 +96,16 @@ const tokenize = input => {
 			numberBuffer += char;
 			continue;
 		}
-		const isUnaryMinus = char === '-' && (i === 0 || isOperator(previousToken) || previousToken === '(');
-		if (isUnaryMinus) {
-			numberBuffer += '-';
-			continue;
+
+		if (char === '-') {
+			const isUnaryMinus = i === 0 || (previousToken === '(' && numberBuffer === '');
+			if (isUnaryMinus) {
+				if (numberBuffer !== '') pushNumberIfExists();
+				numberBuffer = '-';
+				continue;
+			}
 		}
+
 		pushNumberIfExists();
 
 		if (char === '%') {
@@ -210,14 +216,12 @@ const calculate = () => {
 	}
 
 	let tokens = tokenize(normalizedInput);
-
 	if (tokens === null) return null;
 
 	const rpn = convertToReversePolishNotation(tokens);
 	const result = calculateWithPriority(rpn);
 
 	if (result === null) return null;
-	displayEl.value = result;
 	updateParenthesisCounter();
 	return result;
 };
@@ -243,6 +247,8 @@ const inputHandler = e => {
 	if (userInput === '.' && lastNumericToken?.includes('.')) return;
 
 	if (userInput === '%' && !isNumber(inputValue.slice(-1))) return;
+
+	const isUnaryMinus = inputValue === defaultInputValue || inputValue === '-';
 
 	if (inputValue === defaultInputValue) {
 		switch (userInput) {
@@ -280,10 +286,11 @@ const inputHandler = e => {
 				if (typeof userInput === 'number') return inputValue + userInput;
 				const lastChar = inputValue.slice(-1);
 				if (isOperator(userInput)) {
-					if (isOperator(lastChar)) return inputValue.slice(0, -1) + userInput;
-					if (getUnclosedParenthesisCount(inputValue)) return inputValue + userInput;
-					const result = calculate();
-					if (!Object.values(exceptions).includes(result)) return result + userInput;
+					if (isOperator(lastChar)) {
+						if (isUnaryMinus) return inputValue;
+						return inputValue.slice(0, -1) + userInput;
+					}
+					return inputValue + userInput;
 				}
 				if (userInput === '(') {
 					if (isOperator(lastChar) || lastChar === '(') return displayEl.value + '(';
