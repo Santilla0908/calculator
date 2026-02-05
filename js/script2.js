@@ -1,7 +1,12 @@
 const buttonEls = [ ...document.querySelectorAll('.button') ];
+const buttonsContainerEl = document.querySelector('.buttons');
 const displayEl = document.querySelector('.display');
 const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_counter');
-const historyDisplayEl = document.querySelector('.history_display')
+const historyDisplayEl = document.querySelector('.history_display');
+const logOpenEl = document.querySelector('.log_open');
+const logContainerEl = document.querySelector('.log_items');
+const logDeleteEl = document.querySelector('.log_delete');
+
 
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/' ];
@@ -105,7 +110,6 @@ const tokenize = input => {
 				continue;
 			}
 		}
-
 		pushNumberIfExists();
 
 		if (char === '%') {
@@ -222,6 +226,7 @@ const calculate = () => {
 	const result = calculateWithPriority(rpn);
 
 	if (result === null) return null;
+	historyDisplayEl.innerText = `${ inputValue } = ${ result }`;
 	updateParenthesisCounter();
 	return result;
 };
@@ -303,6 +308,11 @@ const inputHandler = e => {
 
 	updateParenthesisCounter();
 };
+
+logOpenEl.addEventListener('click', () => {
+	const isShow = logContainerEl.classList.toggle('show');
+	buttonsContainerEl.style.display = isShow ? 'none' : 'grid';
+});
 
 buttonEls.forEach(buttonEl => {
 	buttonEl.addEventListener('click', e => {
