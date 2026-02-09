@@ -7,9 +7,13 @@ const logOpenEl = document.querySelector('.log_open');
 const logContainerEl = document.querySelector('.log_items');
 const logDeleteEl = document.querySelector('.log_delete');
 
-
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/' ];
+
+const formatTextExpression = (str) => {
+	const tokens = tokenize(str);
+	return tokens ? tokens.join(' ') : str;
+};
 
 const isOperator = char => operators.includes(char);
 
@@ -204,8 +208,21 @@ const calculateWithPriority = tokens => {
 		}
 	}
 	if (stack.length !== 1) return null;
-	return stack[0].toString();
+	return stack[0].round(10).toString();
 };
+
+const addLogItem = (expression, result) => {
+	const itemEl = document.createElement('div');
+	itemEl.classList.add('log_item');
+	const expressionEl = document.createElement('p');
+	expressionEl.classList.add('log_expression');
+	expressionEl.textContent = `${ formatTextExpression(expression) } =`;
+	const resultEl = document.createElement('p');
+	resultEl.classList.add('log_result');
+	resultEl.textContent = result;
+	itemEl.append(expressionEl, resultEl);
+	logContainerEl.append(itemEl);
+}
 
 const calculate = () => {
 	const inputValue = displayEl.value;
@@ -226,8 +243,14 @@ const calculate = () => {
 	const result = calculateWithPriority(rpn);
 
 	if (result === null) return null;
-	historyDisplayEl.innerText = `${ inputValue } = ${ result }`;
+	historyDisplayEl.innerText = `${ formatTextExpression(inputValue) } = ${ result }`;
+
+	if (!Object.values(exceptions).includes(result)) {
+		addLogItem(inputValue, result);
+	}
+
 	updateParenthesisCounter();
+	console.log(typeof result, result);
 	return result;
 };
 
@@ -318,6 +341,10 @@ buttonEls.forEach(buttonEl => {
 	buttonEl.addEventListener('click', e => {
 		inputHandler(e);
 	});
+});
+
+logDeleteEl.addEventListener('click', () => {
+	logContainerEl.querySelectorAll('.log_item').forEach(el => el.remove());
 });
 
 window.addEventListener('keydown', e => {
