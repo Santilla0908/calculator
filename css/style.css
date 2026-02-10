@@ -13,7 +13,7 @@
 	--border: #111827;
 }
 
-h1, p {
+h1, h2, p {
 	margin: 0;
 }
 
@@ -37,6 +37,12 @@ body {
 	border: 1px solid var(--border);
 	background: var(--calculator_bg);
 	color: white;
+}
+
+.calculator {
+	position: relative;
+	width: clamp(400px, 82vw, 600px);
+	min-height: 500px;
 }
 
 .header {
@@ -114,16 +120,9 @@ body {
 	font-size: 18px;
 }
 
-.calculator {
-	display: flex;
-	flex-direction: column;
-	min-height: 400px;
-	width: 400px;
-}
-
 .history_display {
 	width: 100%;
-	height: 30px;
+	height: 40px;
 	color: gray;
 	padding: 5px;
 }
@@ -149,23 +148,52 @@ body {
 }
 
 .log_items {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	bottom: 5px;
+	width: 0;
 	background-color: var(--button);
-	height: 0;
-	min-height: 0;
-	opacity: 0;
+	transition: width 0.3s ease;
 	overflow: hidden;
-	pointer-events: none;
+	opacity: 0;
+	pointer-events: auto;
 }
 
 .log_items.show {
-	position: relative;
-	min-height: 320px;
+	width: clamp(190px, 30vw, 200px);
 	opacity: 1;
-	pointer-events: auto;
 	padding: 10px 0 0 0;
-	text-align: right;
 	display: flex;
 	flex-direction: column;
+}
+
+.log_list {
+	overflow-y: auto;
+	flex: 1;
+	height: 300px;
+}
+
+.log_header {
+	position: relative;
+	text-transform: uppercase;
+	text-align: center;
+	font-size: 15px;
+	display: flex;
+	justify-content: center;
+	height: 31px;
+	transition: color 0.3s ease;
+}
+
+.log_header::before {
+	position: absolute;
+	content: '';
+	display: flex;
+	width: 82px;
+	height: 2px;
+	border-radius: 4px;
+	background-color: var(--text);
+	top: 20px;
 }
 
 .log_item {
@@ -180,6 +208,7 @@ body {
 	margin: 0 0 10px 0;
 	padding: 5px;
 	transition: background 0.15s linear;
+	align-items: flex-end;
 }
 
 .log_item:hover {
@@ -189,21 +218,22 @@ body {
 
 .log_expression {
 	color: gray;
+	font-size: 13px;
 }
 
 .log_result {
-	font-size: 20px;
+	font-size: 15px;
 }
 
 .button.log_delete {
-	position: absolute;
 	width: 35px;
 	height: 35px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	bottom: 8px;
-	right: 4px;
+	flex-shrink: 0;
+	align-self: flex-end;
+	margin: 5px;
 }
 
 .buttons {
@@ -214,6 +244,15 @@ body {
 	width: 100%;
 	flex-grow: 1;
 	padding: 5px;
+	transition: width 0.3s ease;
+	height: 390px;
+}
+
+.calculator.opened .header,
+.calculator.opened .history_display,
+.calculator.opened .display,
+.calculator.opened .buttons {
+	width: clamp(300px, 51vw, 395px);
 }
 
 .reset {
@@ -228,13 +267,16 @@ body {
 }
 
 .button {
-	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	background: var(--button);
 	border-radius: 6px;
 	cursor: pointer;
+}
+
+.log_items.show .buttons {
+	width: 390px;
 }
 
 .opened_parenthesis_counter {
@@ -254,6 +296,41 @@ body {
 .log_delete:hover,
 .button:hover {
 	background: var(--button_hover);
+}
+
+@media (width <= 630px) {
+	.log_items {
+		height: 0;
+		min-height: 0;
+		opacity: 0;
+		overflow: hidden;
+		pointer-events: none;
+		transition: height 0.3s ease;
+	}
+
+	.log_items.show {
+		position: relative;
+		left: 0;
+		min-height: 390px;
+		opacity: 1;
+		pointer-events: auto;
+		padding: 10px 0 0 0;
+		text-align: right;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.calculator.opened .buttons {
+		display: none;
+	}
+
+	.calculator.opened .header,
+	.calculator.opened .history_display,
+	.calculator.opened .display,
+	.calculator.opened .buttons {
+		width: 100%;
+	}
 }
 
 @media (width <= 430px) {

@@ -4,6 +4,7 @@ const displayEl = document.querySelector('.display');
 const openedParenthesisCounterEl = document.querySelector('.opened_parenthesis_counter');
 const historyDisplayEl = document.querySelector('.history_display');
 const logOpenEl = document.querySelector('.log_open');
+const logListEl = document.querySelector('.log_list')
 const logContainerEl = document.querySelector('.log_items');
 const logDeleteEl = document.querySelector('.log_delete');
 
@@ -221,7 +222,7 @@ const addLogItem = (expression, result) => {
 	resultEl.classList.add('log_result');
 	resultEl.textContent = result;
 	itemEl.append(expressionEl, resultEl);
-	logContainerEl.append(itemEl);
+	logListEl.append(itemEl);
 }
 
 const calculate = () => {
@@ -334,7 +335,9 @@ const inputHandler = e => {
 
 logOpenEl.addEventListener('click', () => {
 	const isShow = logContainerEl.classList.toggle('show');
-	buttonsContainerEl.style.display = isShow ? 'none' : 'grid';
+	const calculator = document.querySelector('.calculator');
+
+	calculator.classList.toggle('opened', isShow);
 });
 
 buttonEls.forEach(buttonEl => {
