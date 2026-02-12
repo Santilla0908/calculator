@@ -13,7 +13,8 @@ const operators = [ '+', '-', '*', '/' ];
 
 const formatTextExpression = (str) => {
 	const tokens = tokenize(str);
-	return tokens ? tokens.join(' ') : str;
+	if (!tokens) return str;
+	return tokens.join(' ');
 };
 
 const isOperator = char => operators.includes(char);
@@ -251,7 +252,6 @@ const calculate = () => {
 	}
 
 	updateParenthesisCounter();
-	console.log(typeof result, result);
 	return result;
 };
 
