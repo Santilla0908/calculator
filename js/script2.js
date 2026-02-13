@@ -11,12 +11,6 @@ const logDeleteEl = document.querySelector('.log_delete');
 const defaultInputValue = '0';
 const operators = [ '+', '-', '*', '/' ];
 
-const formatTextExpression = (str) => {
-	const tokens = tokenize(str);
-	if (!tokens) return str;
-	return tokens.join(' ');
-};
-
 const isOperator = char => operators.includes(char);
 
 const isNumber = token => !isNaN(parseFloat(token)) && isFinite(token);
@@ -35,6 +29,7 @@ const updateParenthesisCounter = () => {
 
 const clear = () => {
 	displayEl.value = defaultInputValue;
+	historyDisplayEl.innerText = '';
 	updateParenthesisCounter();
 }
 
@@ -213,17 +208,33 @@ const calculateWithPriority = tokens => {
 	return stack[0].round(10).toString();
 };
 
+const formatTextExpression = str => {
+	const tokens = tokenize(str);
+	if (!tokens?.length) return str;
+	return tokens.join(' ');
+};
+
 const addLogItem = (expression, result) => {
 	const itemEl = document.createElement('div');
 	itemEl.classList.add('log_item');
+
 	const expressionEl = document.createElement('p');
 	expressionEl.classList.add('log_expression');
 	expressionEl.textContent = `${ formatTextExpression(expression) } =`;
+
 	const resultEl = document.createElement('p');
 	resultEl.classList.add('log_result');
 	resultEl.textContent = result;
+
 	itemEl.append(expressionEl, resultEl);
-	logListEl.append(itemEl);
+
+	itemEl.addEventListener('click', () => {
+		displayEl.value = result;
+		historyDisplayEl.innerText = `${formatTextExpression(expression)} = ${result}`;
+		updateParenthesisCounter();
+	});
+
+	logListEl.prepend(itemEl);
 }
 
 const calculate = () => {

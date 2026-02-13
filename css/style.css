@@ -29,7 +29,7 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	min-height: 100vh
+	min-height: 100vh;
 }
 
 .container {
@@ -172,6 +172,7 @@ body {
 	overflow-y: auto;
 	flex: 1;
 	height: 300px;
+	cursor: pointer;
 }
 
 .log_header {
